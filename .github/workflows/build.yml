@@ -34,14 +34,17 @@ jobs:
       
       - name: Get TikTok APK
         run: |
-          # Find tiktok APK in repo or download from release
-          APK=$(ls tiktok*.apk 2>/dev/null | head -1)
-          if [ -n "$APK" ]; then
-            cp "$APK" tiktok.apk
+          # Check repo first
+          if ls tiktok*.apk 2>/dev/null | head -1 | grep -q .; then
+            cp tiktok*.apk tiktok.apk
+          elif [ -f "${{ github.event.inputs.tiktok_version }}.apk" ]; then
+            cp "${{ github.event.inputs.tiktok_version }}.apk" tiktok.apk
           else
-            echo "No APK in repo, skipping build"
-            exit 78  # Skipped
+            # Download from release
+            echo "Downloading TikTok from release..."
+            curl -sL "https://github.com/egoffn1/PureTok/releases/download/v45.0.42/tiktok-45-0-42.apk" -o tiktok.apk || exit 1
           fi
+          ls -la tiktok.apk
       
       - name: Build
         run: |
