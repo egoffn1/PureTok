@@ -1,0 +1,50 @@
+[input]
+apk = "tiktok.apk"
+tiktokVersion = "34.5.3"
+
+[output]
+output = "PureTok.apk"
+outputDir = "output"
+
+[patches.ads]
+hideInfeedAds = true
+hideSplashAds = true
+hideSearchAds = true
+hideHomeScreenAds = true
+hideMiscAds = true
+
+[patches.tracking]
+disableFirebaseAnalytics = true
+disableGoogleAnalytics = true
+disableFacebookSdk = true
+disableAdjust = true
+disableAppsFlyer = true
+disableSentry = true
+disableCrashlytics = true
+
+[patches.layout]
+hideCreateButton = false
+hideFindFriends = true
+hideDuetSuggestion = false
+hideStore = true
+hideLiveStreams = false
+hideRateApp = true
+hideNotificationPrompt = true
+
+[patches.theme]
+amoledTheme = true
+removeLightElements = true
+
+[patches.misc]
+bypassGeoRestrictions = true
+fakeUserAgent = true
+fakeGeoHeaders = true
+removeExtraPermissions = true
+blockClipboardAccess = false
+disableAutoUpdate = true
+removeWatermark = false
+
+[signing]
+useBuiltInKeystore = true
+keyAlias = "androiddebugkey"
+keyPassword = "android"

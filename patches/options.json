@@ -1,0 +1,39 @@
+{
+  "patches": {
+    "ads": {
+      "hideInfeedAds": {"name": "Hide In-feed Ads", "default": true},
+      "hideSplashAds": {"name": "Hide Splash Ads", "default": true},
+      "hideSearchAds": {"name": "Hide Search Ads", "default": true},
+      "hideHomeScreenAds": {"name": "Hide Home Screen Ads", "default": true},
+      "hideMiscAds": {"name": "Hide Misc Ads", "default": true}
+    },
+    "tracking": {
+      "disableFirebaseAnalytics": {"name": "Disable Firebase", "default": true},
+      "disableGoogleAnalytics": {"name": "Disable Google", "default": true},
+      "disableFacebookSdk": {"name": "Disable Facebook", "default": true},
+      "disableAdjust": {"name": "Disable Adjust", "default": true},
+      "disableAppsFlyer": {"name": "Disable AppsFlyer", "default": true},
+      "disableSentry": {"name": "Disable Sentry", "default": true},
+      "disableCrashlytics": {"name": "Disable Crashlytics", "default": true}
+    },
+    "layout": {
+      "hideCreateButton": {"name": "Hide Create Button", "default": false},
+      "hideFindFriends": {"name": "Hide Find Friends", "default": true},
+      "hideStore": {"name": "Hide Store", "default": true},
+      "hideRateApp": {"name": "Hide Rate App", "default": true},
+      "hideNotificationPrompt": {"name": "Hide Notification", "default": true}
+    },
+    "theme": {
+      "amoledTheme": {"name": "AMOLED Theme", "default": true}
+    },
+    "misc": {
+      "bypassGeoRestrictions": {"name": "Bypass Geo", "default": true},
+      "removeWatermark": {"name": "Remove Watermark", "default": false, "warning": "DANGEROUS!"}
+    }
+  },
+  "compatibility": {
+    "minVersion": "33.5.0",
+    "maxVersion": "34.5.3",
+    "packages": ["com.zhiliaoapp.musically", "com.ss.android.ugc.trill"]
+  }
+}
