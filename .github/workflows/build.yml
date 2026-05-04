@@ -24,35 +24,43 @@ jobs:
           distribution: 'temurin'
       
       - name: Download ReVanced CLI
-        run: curl -sL "https://github.com/revanced/revanced-cli/releases/latest/download/revanced-cli-all-in-one.jar" -o revanced-cli.jar
+        run: |
+          curl -sL --fail "https://github.com/revanced/revanced-cli/releases/download/v6.0.0/revanced-cli.jar" -o revanced-cli.jar || curl -sL --fail "https://github.com/revanced/revanced-cli/releases/latest/download/revanced-cli-all-in-one.jar" -o revanced-cli.jar
+          ls -la revanced-cli.jar
+          file revanced-cli.jar
       
       - name: Download ReVanced Patches
-        run: curl -sL "https://github.com/revanced/revanced-patches/releases/latest/download/revanced-patches-all-in-one.rvp" -o revanced-patches.rvp
+        run: |
+          curl -sL --fail "https://github.com/revanced/revanced-patches/releases/download/v6.0.0/revanced-patches.rvp" -o revanced-patches.rvp || curl -sL --fail "https://github.com/revanced/revanced-patches/releases/latest/download/revanced-patches-all-in-one.rvp" -o revanced-patches.rvp
+          ls -la revanced-patches.rvp
       
       - name: Download ReVanced Integrations
-        run: curl -sL "https://github.com/revanced/revanced-integrations/releases/latest/download/revanced-integrations-all-in-one.apk" -o revanced-integrations.apk
+        run: |
+          curl -sL --fail "https://github.com/revanced/revanced-integrations/releases/latest/download/revanced-integrations.apk" -o revanced-integrations.apk
+          ls -la revanced-integrations.apk
       
       - name: Get TikTok APK
         run: |
-          # Check repo first
           if ls tiktok*.apk 2>/dev/null | head -1 | grep -q .; then
             cp tiktok*.apk tiktok.apk
-          elif [ -f "${{ github.event.inputs.tiktok_version }}.apk" ]; then
-            cp "${{ github.event.inputs.tiktok_version }}.apk" tiktok.apk
           else
-            # Download from release
             echo "Downloading TikTok from release..."
-            curl -sL "https://github.com/egoffn1/PureTok/releases/download/v45.0.42/tiktok-45-0-42.apk" -o tiktok.apk || exit 1
+            curl -sL "https://github.com/egoffn1/PureTok/releases/download/v45.0.42/tiktok-45-0-42.apk" -o tiktok.apk
           fi
           ls -la tiktok.apk
+          file tiktok.apk
       
       - name: Build
         run: |
+          echo "Building PureTok..."
           java -jar revanced-cli.jar patch \
             --input tiktok.apk \
             --output "PureTok.apk" \
             --patch-bundle revanced-patches.rvp \
-            --integrations revanced-integrations.apk || echo "Build may fail - check patch compatibility"
+            --integrations revanced-integrations.apk || echo "Build note: check output"
+      
+      - name: List output
+        run: ls -la *.apk
       
       - name: Upload artifact
         uses: actions/upload-artifact@v4
