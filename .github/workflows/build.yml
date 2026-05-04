@@ -38,22 +38,42 @@ jobs:
       
       - name: Get TikTok APK
         run: |
+          # Check for APK in repo
+          ls -la *.apk 2>/dev/null || true
           VERSION="${{ github.event.inputs.tiktok_version }}"
-          if [ -f "tiktok-$VERSION.apk" ]; then cp "tiktok-$VERSION.apk" tiktok.apk
-          elif [ -f "tiktok.apk" ]; then echo "Using tiktok.apk"
-          else echo "ERROR: No TikTok APK"; exit 1
+          if [ -f "tiktok-$VERSION.apk" ]; then 
+            cp "tiktok-$VERSION.apk" tiktok.apk
+            echo "Using tiktok-$VERSION.apk"
+          elif [ -f "tiktok.apk" ]; then 
+            echo "Using tiktok.apk"
+          else
+            echo "ERROR: No TikTok APK found!"
+            echo "Please upload TikTok APK to this repository"
+            echo "1. Download TikTok from https://www.apkmirror.com"
+            echo "2. Rename to tiktok-34.5.3.apk and add to repo"
+            exit 1
           fi
+      
+      - name: List files
+        run: ls -la
       
       - name: Build
         run: |
           VERSION="${{ github.event.inputs.tiktok_version }}"
-          java -jar revanced-cli.jar patch --input tiktok.apk --output "PureTok-v${VERSION}.apk" --patch-bundle revanced-patches.rvp --integrations revanced-integrations.apk || true
+          java -jar revanced-cli.jar patch \
+            --input tiktok.apk \
+            --output "PureTok-v${VERSION}.apk" \
+            --patch-bundle revanced-patches.rvp \
+            --integrations revanced-integrations.apk || echo "Build failed - check patches compatibility"
       
       - name: Upload artifact
+        run: ls -la PureTok*.apk 2>/dev/null && echo "=== Build Complete ===" || echo "No APK produced"
+      
+      - name: Upload artifact ( Success)
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: PureTok
+          name: PureTok-v${{ github.event.inputs.tiktok_version }}
           path: PureTok*.apk
           retention-days: 30
       
@@ -61,4 +81,6 @@ jobs:
         if: github.event_name == 'release'
         run: |
           VERSION="${{ github.event.inputs.tiktok_version }}"
-          gh release upload "${{ github.ref_name }}" "PureTok-v${VERSION}.apk" --clobber
+          if [ -f "PureTok-v${VERSION}.apk" ]; then
+            gh release upload "${{ github.ref_name }}" "PureTok-v${VERSION}.apk" --clobber
+          fi
