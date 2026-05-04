@@ -16,54 +16,49 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
       
-      - name: Download ReVanced CLI
+      - name: Download ReVanced CLI (inotia00)
         run: |
-          curl -sL "https://github.com/revanced/revanced-cli/releases/download/v5.0.1/revanced-cli-5.0.1-all.jar" -o revanced-cli.jar
+          curl -sL "https://github.com/inotia00/revanced-cli/releases/download/v5.0.2/revanced-cli-5.0.2-all.jar" -o revanced-cli.jar
           ls -la revanced-cli.jar
           file revanced-cli.jar
       
-      - name: Download ReVanced Patches via JSDelivr
-        run: |
-          curl -sL "https://cdn.jsdelivr.net/gh/revanced/revanced-patches/patches/patches.rvp" -o revanced-patches.rvp || \
-          curl -sL "https://cdn.jsdelivr.net/gh/inotia00/revanced-patches/patches.rvp" -o revanced-patches.rvp || \
-          echo "No patches"
-          ls -la revanced-patches.rvp
-          file revanced-patches.rvp
-      
-      - name: Download ReVanced Integrations via JSDelivr  
-        run: |
-          curl -sL "https://cdn.jsdelivr.net/gh/revanced/revanced-integrations/app/build/outputs/apk/release/revanced-integrations.apk" -o revanced-integrations.apk || \
-          echo "No integrations"
-          ls -la revanced-integrations.apk
-          file revanced-integrations.apk
-      
       - name: Get TikTok APK
         run: |
-          curl -sL "https://github.com/egoffn1/PureTok/releases/download/v45.0.42/tiktok-45-0-42.apk" -o tiktok.apk
+          curl -sL "https://github.com/egoffn1/PureTok/releases/download/v45.0.42/tiktok-45.0-42.apk" -o tiktok.apk
           ls -la tiktok.apk
       
-      - name: Build
+      - name: Build with patches from repo
         run: |
-          echo "Building..."
-          ls -la
-          # Пробуем разные варианты
-          if [ -f "revanced-patches.rvp" ] && [ -s "revanced-patches.rvp" ]; then
-            java -jar revanced-cli.jar patch \
-              --input tiktok.apk \
-              --output "PureTok.apk" \
-              --patch-bundle revanced-patches.rvp \
-              --integrations revanced-integrations.apk || echo "Build1 failed"
+          echo "Listing patches files in repo:"
+          find . -name "*.rvp" -o -name "patches*" | head -10
+          
+          # Use patches from repo if available, otherwise download
+          if ls patches/*.rvp 2>/dev/null | head -1 | grep -q .; then
+            PATCHES=$(ls patches/*.rvp | head -1)
+          elif [ -f "patches.rvp" ]; then
+            PATCHES="patches.rvp"
           else
-            echo "Skipping build - no patches file"
+            echo "Downloading patches..."
+            curl -sL "https://github.com/inotia00/revanced-patches/releases/download/v5.14.1/patches-5.14.1.rvp" -o patches.rvp
+            PATCHES="patches.rvp"
           fi
-          ls -la *.apk 2>/dev/null || echo "No APK produced"
+          
+          ls -la "$PATCHES"
+          
+          echo "Building..."
+          java -jar revanced-cli.jar patch \
+            --input tiktok.apk \
+            --output "PureTok.apk" \
+            --patch-bundle "$PATCHES" || echo "Build failed - checking TikTok support"
       
       - name: Upload artifact
         if: success()
@@ -74,7 +69,7 @@ jobs:
           retention-days: 30
       
       - name: Upload to Release
-        if: github.event_name == 'release'
+        if: github.event_name == 'release' && success()
         run: |
           if [ -f "PureTok.apk" ]; then
             gh release upload "${{ github.ref_name }}" PureTok.apk --clobber
