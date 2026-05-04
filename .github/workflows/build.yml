@@ -25,6 +25,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: '17'
+          distribution: 'temurin'
       
       - name: Download ReVanced CLI
         run: curl -sL "https://github.com/revanced/revanced-cli/releases/latest/download/revanced-cli-all-in-one.jar" -o revanced-cli.jar
