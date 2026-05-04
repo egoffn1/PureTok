@@ -38,6 +38,7 @@ jobs:
       
       - name: Get TikTok APK
         run: |
+<<<<<<< HEAD
           # Check for APK in repo
           ls -la *.apk 2>/dev/null || true
           VERSION="${{ github.event.inputs.tiktok_version }}"
@@ -51,6 +52,16 @@ jobs:
             echo "Please upload TikTok APK to this repository"
             echo "1. Download TikTok from https://www.apkmirror.com"
             echo "2. Rename to tiktok-34.5.3.apk and add to repo"
+=======
+          VERSION="${{ github.event.inputs.tiktok_version }}"
+          # Find any tiktok APK in repo
+          APK_FILE=$(ls tiktok*.apk 2>/dev/null | head -1)
+          if [ -n "$APK_FILE" ]; then
+            cp "$APK_FILE" tiktok.apk
+            echo "Using: $APK_FILE"
+          else
+            echo "ERROR: No TikTok APK found!"
+>>>>>>> 2a668da (Add TikTok APK v45.0.42 and fix workflow)
             exit 1
           fi
       
