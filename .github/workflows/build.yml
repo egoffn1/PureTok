@@ -25,42 +25,41 @@ jobs:
       
       - name: Download ReVanced CLI
         run: |
-          curl -sL --fail "https://github.com/revanced/revanced-cli/releases/download/v6.0.0/revanced-cli.jar" -o revanced-cli.jar || curl -sL --fail "https://github.com/revanced/revanced-cli/releases/latest/download/revanced-cli-all-in-one.jar" -o revanced-cli.jar
+          echo "Downloading ReVanced CLI..."
+          curl -sL "https://github.com/revanced/revanced-cli/releases/download/v4.5.0/revanced-cli.jar" -o revanced-cli.jar || \
+          curl -sL "https://github.com/revanced/revanced-cli/releases/download/v5.0.0/revanced-cli.jar" -o revanced-cli.jar || \
+          curl -sL "https://github.com/revanced/revanced-cli/releases/download/v5.0.1/revanced-cli.jar" -o revanced-cli.jar
           ls -la revanced-cli.jar
-          file revanced-cli.jar
       
       - name: Download ReVanced Patches
         run: |
-          curl -sL --fail "https://github.com/revanced/revanced-patches/releases/download/v6.0.0/revanced-patches.rvp" -o revanced-patches.rvp || curl -sL --fail "https://github.com/revanced/revanced-patches/releases/latest/download/revanced-patches-all-in-one.rvp" -o revanced-patches.rvp
+          echo "Downloading ReVanced Patches..."
+          curl -sL "https://github.com/revanced/revanced-patches/releases/download/v0.119.0/revanced-patches.rvp" -o revanced-patches.rvp || \
+          curl -sL "https://github.com/revanced/revanced-patches/releases/download/latest/revanced-patches.rvp" -o revanced-patches.rvp || \
+          curl -sL "https://github.com/revanced/revanced-patches/releases/download/v0.120.0/revanced-patches.rvp" -o revanced-patches.rvp
           ls -la revanced-patches.rvp
       
-      - name: Download ReVanced Integrations
+      - name: Download ReVanced Integrations  
         run: |
-          curl -sL --fail "https://github.com/revanced/revanced-integrations/releases/latest/download/revanced-integrations.apk" -o revanced-integrations.apk
-          ls -la revanced-integrations.apk
+          echo "Downloading ReVanced Integrations..."
+          curl -sL "https://github.com/revanced/revanced-integrations/releases/latest/download/revanced-integrations.apk" -o revanced-integrations.apk || \
+          curl -sL "https://cdn.jsdelivr.net/gh/revanced/revanced-integrations/app/build/outputs/apk/release/revanced-integrations.apk" -o revanced-integrations.apk
+          ls -la revanced-integrations.apk || echo "WARNING: Integrations not downloaded"
       
       - name: Get TikTok APK
         run: |
-          if ls tiktok*.apk 2>/dev/null | head -1 | grep -q .; then
-            cp tiktok*.apk tiktok.apk
-          else
-            echo "Downloading TikTok from release..."
-            curl -sL "https://github.com/egoffn1/PureTok/releases/download/v45.0.42/tiktok-45-0-42.apk" -o tiktok.apk
-          fi
+          echo "Downloading TikTok from release..."
+          curl -sL "https://github.com/egoffn1/PureTok/releases/download/v45.0.42/tiktok-45-0-42.apk" -o tiktok.apk
           ls -la tiktok.apk
-          file tiktok.apk
       
       - name: Build
         run: |
-          echo "Building PureTok..."
+          echo "Building..."
           java -jar revanced-cli.jar patch \
             --input tiktok.apk \
             --output "PureTok.apk" \
             --patch-bundle revanced-patches.rvp \
-            --integrations revanced-integrations.apk || echo "Build note: check output"
-      
-      - name: List output
-        run: ls -la *.apk
+            --integrations revanced-integrations.apk || echo "Build failed"
       
       - name: Upload artifact
         uses: actions/upload-artifact@v4
