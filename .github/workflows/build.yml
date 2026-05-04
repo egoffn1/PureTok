@@ -1,0 +1,63 @@
+name: Build PureTok APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      tiktok_version:
+        description: 'TikTok version (e.g. 34.5.3)'
+        required: true
+        default: '34.5.3'
+        type: string
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+      
+      - name: Download ReVanced CLI
+        run: curl -sL "https://github.com/revanced/revanced-cli/releases/latest/download/revanced-cli-all-in-one.jar" -o revanced-cli.jar
+      
+      - name: Download ReVanced Patches
+        run: curl -sL "https://github.com/revanced/revanced-patches/releases/latest/download/revanced-patches-all-in-one.rvp" -o revanced-patches.rvp
+      
+      - name: Download ReVanced Integrations
+        run: curl -sL "https://github.com/revanced/revanced-integrations/releases/latest/download/revanced-integrations-all-in-one.apk" -o revanced-integrations.apk
+      
+      - name: Get TikTok APK
+        run: |
+          VERSION="${{ github.event.inputs.tiktok_version }}"
+          if [ -f "tiktok-$VERSION.apk" ]; then cp "tiktok-$VERSION.apk" tiktok.apk
+          elif [ -f "tiktok.apk" ]; then echo "Using tiktok.apk"
+          else echo "ERROR: No TikTok APK"; exit 1
+          fi
+      
+      - name: Build
+        run: |
+          VERSION="${{ github.event.inputs.tiktok_version }}"
+          java -jar revanced-cli.jar patch --input tiktok.apk --output "PureTok-v${VERSION}.apk" --patch-bundle revanced-patches.rvp --integrations revanced-integrations.apk || true
+      
+      - name: Upload artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: PureTok
+          path: PureTok*.apk
+          retention-days: 30
+      
+      - name: Create Release
+        if: github.event_name == 'release'
+        run: |
+          VERSION="${{ github.event.inputs.tiktok_version }}"
+          gh release upload "${{ github.ref_name }}" "PureTok-v${VERSION}.apk" --clobber
