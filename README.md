@@ -30,3 +30,20 @@ java -jar revanced-cli.jar patch \
   --patches patches.rvp \
   --out puretok.apk \
   original_tiktok.apk
+```
+
+## 📂 Структура репозитория
+- `patches/` – набор ReVanced-патчей (`.patch` и файлы `.smali`)  
+- `assets/` – скриншоты и иконки  
+- `README.md` – этот файл  
+- `LICENSE` – GPL-3.0  
+
+## ⚠️ Дисклеймер
+Проект создан в образовательных целях. Использование модов нарушает условия использования TikTok и может привести к блокировке аккаунта. Разработчик не несёт ответственности за возможные последствия.
+
+## 🤝 Помощь и развитие
+Pull request’ы приветствуются! Баги и пожелания — в [Issues](https://github.com/ваш-username/PureTok/issues).
+
+---
+**Enjoy scrolling without distractions.**
+```
